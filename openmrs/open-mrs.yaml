@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openmrs-deploy
+spec:
+  minReadySeconds: 4
+  replicas: 2
+  selector:
+    matchLabels:
+      app: openmrs
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      name: openmrs
+      labels:
+        app: openmrs
+        ver: "1.0"
+    spec:
+      containers:
+        - name: openmrs
+          image: reddy8096/openmrs1.0:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-openmrs
+spec:
+  type: LoadBalancer
+  selector:
+    app: openmrs
+  ports:
+    - name: gol
+      protocol: TCP
+      port: 80
+      targetPort: 8080
